@@ -1,3 +1,4 @@
+from json import tool
 import random
 from deap import creator, base, tools, algorithms
 
@@ -29,11 +30,10 @@ class GeneticAlgorithmSearch:
             model = self.model_builder(offspring)
             history = model.fit(x_train, y_label, epochs=epochs, validation_split=validation_split, verbose=2)
             val_acc_per_epoch = history.history['val_accuracy']
-            print(f"max val accuracy: {max(val_acc_per_epoch)}")
             return max(val_acc_per_epoch),
 
         def _individual():
-            return creator.Individual(params)
+            return creator.Individual([x() for x in params])
 
         toolbox = base.Toolbox()
         toolbox.register("individual", _individual)
@@ -45,12 +45,14 @@ class GeneticAlgorithmSearch:
         toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)
         toolbox.register("select", tools.selTournament, tournsize=3)
 
-        population = toolbox.population(n=5)
+        population = toolbox.population(n=10)
+        print(f"INITIAL POPULATIONS: {population}")
 
         NGEN=5
         for gen in range(NGEN):
-            print(f"GENERATION {gen} STARTED")
+            print(f"GENERATION:{gen} STARTED")
             offspring = algorithms.varAnd(population, toolbox, cxpb=0.5, mutpb=0.1)
+            print(f"GENERATION:{gen} POPULATIONS: {offspring}")
             fits = toolbox.map(toolbox.evaluate, offspring)
             for fit, ind in zip(fits, offspring):
                 print(f"HP: {ind}, SCORE: {fit}")
@@ -58,17 +60,21 @@ class GeneticAlgorithmSearch:
             print(f"GENERATION {gen} COMPLETED, BEST_SCORE: {tools.selBest(population, k=1)}, BEST_HP: {tools.selBest(population, k=1)}")
             population = toolbox.select(offspring, k=len(population))
         
+        print(f"FINAL HP: {tools.selBest(population, k=len(population))}")
         self.best_hp = tools.selBest(population, k=1)
 
 
 class Hparams:
-    @staticmethod
-    def Int(param_name, min_value, max_value, step):
-        return random.randrange(min_value, max_value, step)
+    def __init__(self) -> None:
+        self.tools = base.Toolbox()
+
+    def Int(self, param_name, min_value, max_value, step):
+        self.tools.register(param_name, random.randrange, min_value, max_value, step)
+        return self.tools.__dict__[param_name]
     
-    @staticmethod
-    def Choice(param_name, values):
-        return random.choice(values)
+    def Choice(self, param_name, values):
+        self.tools.register(param_name, random.choice, values)
+        return self.tools.__dict__[param_name]
 
 
 if __name__ == "__main__":
@@ -76,5 +82,7 @@ if __name__ == "__main__":
     # define search parameters
     hp_units = ht.Int('units', min_value=32, max_value=512, step=32)
     hp_learning_rate = ht.Choice('learning_rate', values=[1e-2, 1e-3, 1e-4])
-    params = [hp_units, hp_learning_rate]
+    hp_activation = ht.Choice('activation', values=['relu', 'sigmoid', 'tanh'])
+    print(type(hp_units))
+    params = [hp_units(), hp_learning_rate(), hp_activation()]
     print(params)
