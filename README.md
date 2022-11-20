@@ -2,7 +2,7 @@
 [![Downloads](https://pepy.tech/badge/complex/month)](https://pepy.tech/project/complex/month)
 [![Downloads](https://pepy.tech/badge/complex/week)](https://pepy.tech/project/complex/week)
 
-# Hypertune
+# Hyperoptim
 > Hyperparameter Optimization Using Genetic Algorithm.
 
 ## Installation
@@ -10,13 +10,13 @@
 OS X , Windows & Linux:
 
 ```sh
-pip install hypertune
+pip install hyperoptim
 ```
 ## Usage example
 Use for find best hyperparameter
 
 ```python
-from hypertune import GASearch, Hparams
+from hyperoptim import GASearch, Hparams
 import tensorflow as tf
 from tensorflow import keras
 
@@ -69,8 +69,8 @@ print("[test loss, test accuracy]:", eval_result)
 For local development setup
 
 ```sh
-git clone https://github.com/deepak7376/hypertune
-cd hypertune
+git clone https://github.com/deepak7376/hyperoptim
+cd hyperoptim
 pip install -r requirements.txt
 ```
 
