@@ -16,7 +16,7 @@ CLASSIFIERS = [
   
 # calling the setup function  
 setup(name='hyperoptim', 
-      version='0.0.1', 
+      version='0.0.2', 
       description='Hyperparameter Optimization using Genetic Algorithms.', 
       long_description=long_description, 
       long_description_content_type='text/markdown',
